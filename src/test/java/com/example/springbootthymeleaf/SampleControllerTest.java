@@ -1,5 +1,9 @@
 package com.example.springbootthymeleaf;
 
+import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlHeading1;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,26 +18,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static org.assertj.core.api.Assertions.*;
+
 @RunWith(SpringRunner.class)
 @WebMvcTest(SampleController.class)
 public class SampleControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    WebClient webClient;
 
     @Test
     public void hello() throws Exception{
-        // 요청 "/hello"
-        // 응답
-        // - 모델 name : beobsik
-        // - 뷰 이름 : hello
-
-        mockMvc.perform(get("/hello"))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(view().name("hello"))
-                .andExpect(model().attribute("name", is("beobsik")))
-                .andExpect(content().string(containsString("beobsik")));
+        HtmlPage page=webClient.getPage("/hello");
+        HtmlHeading1 h1=page.getFirstByXPath("//h1");
+        assertThat(h1.getTextContent()).isEqualToIgnoringCase("beobsik");
     }
 
 }
